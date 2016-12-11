@@ -1,0 +1,1606 @@
+//config.java
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+public class config extends JFrame implements ActionListener {
+	GridBagConstraints c;
+	JButton cancel;
+	CheckboxGroup cbg;
+	JButton confirm;
+	Label label1;
+	Label label2;
+	Label label3;
+	Checkbox large;
+	Checkbox medium;
+	readFile obj = new readFile();
+	JPanel pan1;
+	JPanel pan2;
+	JPanel pan3;
+	Checkbox small;
+	JTextField tf0;
+	JTextField tf1;
+	JTextField tf10;
+	JTextField tf11;
+	JTextField tf2;
+	JTextField tf3;
+	JTextField tf4;
+	JTextField tf5;
+	JTextField tf6;
+	JTextField tf7;
+	JTextField tf8;
+	JTextField tf9;
+	Checkbox verySmall;
+
+	// 생성자
+	public config() {
+		setTitle("요금 설정");// 제목표시줄
+		setSize(350, 180);// 사이즈
+		setLocation(350, 250);// 창이 뜨는 위치
+		pan1();// 메소드 호출
+		setVisible(true);// 보이로독 함
+		setResizable(false);// 크기변경 불가
+
+	}
+
+	@Override
+	// 액션리스너
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == confirm) {// 확인 버튼
+			// temp에 텍스트필드에서 값을 얻어와서 저장함
+			String temp = tf0.getText() + "," + tf1.getText() + ","
+					+ tf2.getText() + "," + tf3.getText() + "," + tf4.getText()
+					+ "," + tf5.getText() + "," + tf6.getText() + ","
+					+ tf7.getText() + "," + tf8.getText() + "," + tf9.getText()
+					+ "," + tf10.getText() + "," + tf11.getText();
+				// 파일을 열어서 값을 저장함
+			DataBase.executeUpdate("delete from data where name='config'");
+				DataBase.executeUpdate(DataBase.queryBuilder("insert into data values('config', '",temp,"')"));
+			dispose();// 창 닫음
+		} else if (ae.getSource() == cancel) {// 취소버튼
+			dispose();// 창닫음
+		}
+	}
+
+	// 그리드백 레이아웃을 손쉽게 사용하기위해 만듬
+	public void layout(Component obj, int x, int y, int width, int height) {
+		c.gridx = x; // 시작위치 x
+		c.gridy = y; // 시작위치 y
+		c.gridwidth = width; // 컨테이너 너비
+		c.gridheight = height; // 컨테이너 높이
+		add(obj, c);
+	}
+
+	// 판넬1
+	public void pan1() {
+		GridBagLayout gridbag = new GridBagLayout();// 그리드백 레이아웃 생성
+		setLayout(gridbag);// 레이아웃 설정
+		c = new GridBagConstraints();// 그리드백 레이아웃을 제어하는 객체
+		c.fill = GridBagConstraints.BOTH; // 전체를 채움
+		tf0 = new JTextField("" + obj.c[0]);//
+		tf1 = new JTextField("" + obj.c[1]);//
+		tf2 = new JTextField("" + obj.c[2]);//
+		tf3 = new JTextField("" + obj.c[3]);//
+		tf4 = new JTextField("" + obj.c[4]);//
+		tf5 = new JTextField("" + obj.c[5]);//
+		tf6 = new JTextField("" + obj.c[6]);//
+		tf7 = new JTextField("" + obj.c[7]);//
+		tf8 = new JTextField("" + obj.c[8]);//
+		tf9 = new JTextField("" + obj.c[9]);//
+		tf10 = new JTextField("" + obj.c[10]);//
+		tf11 = new JTextField("" + obj.c[11]);// 텍스트필드에 파일에서 읽어온 값을 띄움
+		confirm = new JButton("확인");// 버튼
+		cancel = new JButton("취소");// 버튼
+		confirm.addActionListener(this);//
+		cancel.addActionListener(this);// 액션이벤트 등록
+		layout(new Label("경차"), 1, 0, 2, 1);//
+		layout(new Label("소형차"), 3, 0, 2, 1);//
+		layout(new Label("중형차"), 5, 0, 2, 1);//
+		layout(new Label("대형차"), 7, 0, 2, 1);//
+		layout(new Label("1시간 기본요금"), 0, 1, 1, 1);// 라벨 부착
+		layout(tf0, 1, 1, 2, 1);//
+		layout(tf3, 3, 1, 2, 1);//
+		layout(tf6, 5, 1, 2, 1);//
+		layout(tf9, 7, 1, 2, 1);// 텍스트 필드 부착
+		layout(new Label("이후 30분당 요금"), 0, 2, 1, 1);// 라벨 부착
+		layout(tf1, 1, 2, 2, 1);//
+		layout(tf4, 3, 2, 2, 1);//
+		layout(tf7, 5, 2, 2, 1);//
+		layout(tf10, 7, 2, 2, 1);// 텍스트 필드 부착
+		layout(new Label("최대요금"), 0, 3, 1, 1);// 라벨 부착
+		layout(tf2, 1, 3, 2, 1);//
+		layout(tf5, 3, 3, 2, 1);//
+		layout(tf8, 5, 3, 2, 1);//
+		layout(tf11, 7, 3, 2, 1);// 텍스트 필드 부착
+		layout(confirm, 1, 6, 2, 1);// 확인 버튼 부착
+		layout(cancel, 3, 6, 2, 1);// 취소 버튼 부착
+
+	}
+}
+
+//CustomResultSet.java
+
+
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+public class CustomResultSet {
+	private List<Row> rows;
+	private int offset=-1;
+	
+	public CustomResultSet(ResultSet rs){
+		rows = new ArrayList<Row>();
+		try {
+			while(rs.next()){
+				ResultSetMetaData column = rs.getMetaData();
+				int count = column.getColumnCount();
+				Row row = new Row();
+				for(int i = 0 ; i < count; i++){
+					row.addColumn(column.getColumnName(i+1), rs.getObject(i+1));
+				}
+				rows.add(row);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public boolean next(){
+		offset++;
+		if(offset<rows.size()){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	public String singleGetString(String str){
+		return (String)rows.get(0).get(str);
+	}
+
+	public String singleGetString(int i){
+		return (String)rows.get(0).get(i);
+	}
+	
+	public int singleGetInt(String str){
+		return (Integer) rows.get(0).get(str);
+	}
+
+	public int singleGetInt(int i){
+		return (Integer)rows.get(0).get(i);
+	}
+	
+	public String getString(String str){
+		return (String)rows.get(offset).get(str);
+	}
+	
+	public String getString(int str){
+		return (String)rows.get(offset).get(str);
+	}
+
+	public int getInt(String str){
+		return (Integer)rows.get(offset).get(str);
+	}
+	
+	public int getInt(int str){
+		return (Integer)rows.get(offset).get(str);
+	}
+	
+	private class Row{
+		private List<String> columns;
+		private HashMap<String,Object> metaDatas;
+		protected Row(){
+			columns = new ArrayList<String>();
+			metaDatas = new HashMap<String,Object>();
+		}
+		
+		protected void addColumn(String columnName, Object columnData){
+			columns.add(columnName);
+			metaDatas.put(columnName, columnData);
+		}
+		
+		protected Object get(String columnName){
+			return metaDatas.get(columnName);
+		}
+		
+		protected Object get(int i){
+			return metaDatas.get(columns.get(i-1));
+		}
+		
+		
+		
+	}
+
+}
+
+//DataBase.java
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class DataBase {
+	public static Connection con;
+	public static Statement st;
+	public static String id = "root";
+	public static String password = "rlaxogml";
+	public static String dbName = "db2_7";
+	
+	public static boolean accept() {
+		try {
+        	if(st==null||st.isClosed())
+            try {
+                Class.forName("com.mysql.jdbc.Driver");
+                con = DriverManager.getConnection("jdbc:mysql://localhost/" + dbName, id, password);
+                st = con.createStatement();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return true;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+	}
+
+	public static String queryBuilder(String... args) {
+		StringBuilder builder = new StringBuilder();
+		for(String str : args){
+			builder.append(str);
+		}
+		return builder.toString();
+	}
+	
+	public static String queryBuilder(Object... args) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < args.length; i++) {
+			builder.append(args[i]);
+		}
+		return builder.toString();
+	}
+
+	public static synchronized void dissconn() {
+		checkStatement();
+		try {
+			con.close();
+			st.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void checkStatement() {
+			if (st == null) {
+				accept();
+			}
+	}
+
+	public static synchronized CustomResultSet executeQuery(String query) {
+		checkStatement();
+		try {
+			return new CustomResultSet(st.executeQuery(query));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static synchronized int executeUpdate(String query) {
+		checkStatement();
+		try {
+			return st.executeUpdate(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	public static synchronized void execute(String query) {
+		checkStatement();
+		try {
+			st.execute(query);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static synchronized Statement getStatement() {
+		checkStatement();
+		return st;
+	}
+}
+
+//execute.java
+
+public class execute {
+	public static void main(String[] args) {
+		mainWindow cl = new mainWindow();// 메인윈도우 객체 생성
+		Thread th = new Thread(cl);// 객체를 스레드로 생성
+		th.start();// 스레드를 실행
+	}
+}
+
+//logWindow.java
+
+import java.awt.Checkbox;
+import java.awt.CheckboxGroup;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Label;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableColumnModel;
+import javax.swing.table.DefaultTableModel;
+
+@SuppressWarnings("serial")
+public class logWindow extends JFrame implements ActionListener, ItemListener {
+	static int largeCnt = 0;
+	static int mediumCnt = 0;
+	static int smallCnt = 0;
+	static int totalCar = 0;
+	static int totalCharge = 0;
+	static int verySmallCnt = 0;
+	Checkbox cb0;
+	Checkbox cb1;
+	Checkbox cb2;
+	DefaultTableColumnModel cModel;
+	String[] historyCol = { "자리번호", "차종", "차량번호", "입차시간", "출차시간", "주차시간(분)",
+			"요금(원)" };
+	Label label1;
+	Label label10;
+	Label label11;
+	Label label12;
+	Label label13;
+	Label label14;
+	Label label15;
+	Label label16;
+	Label label2;
+	Label label3;
+	Label label4;
+	Label label5;
+	Label label6;
+	Label label7;
+	Label label8;
+	Label label9;
+	DefaultTableModel model;
+	DefaultTableModel model2;
+	readLog obj = new readLog();
+	JPanel pan1;
+	JPanel pan2;
+	JPanel pan3;
+	JPanel pan4;
+	JPanel pan5;
+	JScrollPane scrollpane;
+	JScrollPane scrollpane2;
+	JButton search;
+	JTable table;
+	JTable table2;
+	String[] temp = new String[7];
+	JTextField tf1;
+	JTextField tf2;
+	JTextField tf3;
+	JTextField tf4;
+	String[] totalCol = { "통계", "경차", "소형차", "중형차", "대형차", "차량댓수", "요금합계(원)" };
+
+	// 생성자
+	public logWindow() {
+		setTitle("주차내역");// 제목표시줄
+		setSize(1000, 700);// 사이즈
+		model = new DefaultTableModel(historyCol, 0);// 주차 내역 테이블 모델
+		table = new JTable(model);// 테이블
+		model2 = new DefaultTableModel(totalCol, 0);// 통계 테이블 모델
+		table2 = new JTable(model2);// 테이블
+		pan1 = new JPanel();// 패널 생성
+		pan2 = new JPanel();// 패널 생성
+		pan3 = new JPanel();// 패널 생성
+		defaultTable();// 메소드 호출
+		pan1();// 메소드 호출
+		pan3();// 메소드 호출
+		setVisible(true);// 보이게 함
+		setResizable(false);// 크기 조절 불가
+	}
+
+	// 액션이벤트
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == search) {// 검색 버튼
+			String temp1 = tf1.getText();// 차량 번호
+			String temp2 = tf2.getText();// 년
+			String temp3 = tf3.getText();// 월
+			String temp4 = tf4.getText();// 일 //텍스트 박스로부터 값을 받아옴
+			removeTable();// 테이블을 지움
+			// 검색 부분
+			// 차량 번호로 검색
+			if (!temp1.isEmpty() && temp2.isEmpty() && temp3.isEmpty()
+					&& temp4.isEmpty()) {
+				carNumberSearch(tf1.getText());
+			}
+			// 날짜로 검색
+			else if (temp1.isEmpty() && !temp2.isEmpty() && !temp3.isEmpty()
+					&& !temp4.isEmpty()) {
+				dateSearch(tf2.getText(), tf3.getText(), tf4.getText());
+			} else {// 칸이 모두 비어있을 경우
+				defaultTable();// 기본 내역 출력
+			}
+		}
+	}
+
+	// 차량번호로 검색하는 메소드
+	public void carNumberSearch(String carNumber) {
+		totalCar = 0;//
+		verySmallCnt = 0;//
+		smallCnt = 0;//
+		mediumCnt = 0;//
+		largeCnt = 0;//
+		totalCharge = 0;// 통계 값 초기화
+		for (int i = 0; i < obj.length; i++) {// 파일에서 검색
+			if (obj.carNumber[i].equals(carNumber)) {// 파일에 저장된 차량번호가 현재 칸에 입력한
+														// 차량번호와 같을 경우
+				temp[0] = obj.jariNumber[i];//
+				temp[1] = obj.carSelect[i];//
+				temp[2] = obj.carNumber[i];//
+				temp[3] = obj.printParkTime[i];//
+				temp[4] = obj.printUnparkTime[i];//
+				temp[5] = obj.inTime[i];//
+				temp[6] = obj.charge[i];// 그 차량의 내용을 temp 배열에 저장
+				model.addRow(temp);// 테이블에 추가
+				total(obj.carSelect[i], obj.inTime[i], obj.charge[i]);// 통계 계산
+				totalCar++;// 총 차량 +1
+			}
+		}
+		// 통계 테이블
+		temp[0] = "";// 공백
+		temp[1] = Integer.toString(verySmallCnt);// 경차 카운트
+		temp[2] = Integer.toString(smallCnt);// 소형차 카운트
+		temp[3] = Integer.toString(mediumCnt);// 중형차 카운트
+		temp[4] = Integer.toString(largeCnt);// 대형차 카운트
+		temp[5] = Integer.toString(totalCar);// 총 차량 카운트
+		temp[6] = Integer.toString(totalCharge);// 총 요금
+		model2.addRow(temp);// 테이블에 추가
+	}
+
+	// 날짜로 검색하는 메소드
+	public void dateSearch(String year, String month, String day) {
+		totalCar = 0;//
+		verySmallCnt = 0;//
+		smallCnt = 0;//
+		mediumCnt = 0;//
+		largeCnt = 0;//
+		totalCharge = 0;// 통계 값 초기화
+		for (int i = 0; i < obj.length; i++) {// 파일에서 검색
+			String s = obj.printUnparkTime[i];// 날짜를 기준으로 검색
+			if (s.matches(year + "년.*"))// 년 텍스트필드 + "년"과 같은 문자열이 있는지 검색함
+				if (s.matches(".*" + month + "월.*"))// 월 텍스트필드 + "월"과 같은 문자열이
+													// 있는지 검색함
+					if (s.matches(".*" + day + "일.*")) {// 일 텍스트필드 + "일"과 같은
+														// 문자열이 있는지 검색함
+						temp[0] = obj.jariNumber[i];//
+						temp[1] = obj.carSelect[i];//
+						temp[2] = obj.carNumber[i];//
+						temp[3] = obj.printParkTime[i];//
+						temp[4] = obj.printUnparkTime[i];//
+						temp[5] = obj.inTime[i];//
+						temp[6] = obj.charge[i];// 내용을 temp배열에 추가
+						model.addRow(temp);// 테이블에 추가
+						total(obj.carSelect[i], obj.inTime[i], obj.charge[i]);// 통계
+																				// 계산
+						totalCar++;// 총 차량 계산
+					}
+
+		}
+		// 통계 테이블
+		temp[0] = "";
+		temp[1] = Integer.toString(verySmallCnt);// 경차 카운트
+		temp[2] = Integer.toString(smallCnt);// 소형차 카운트
+		temp[3] = Integer.toString(mediumCnt);// 중형차 카운트
+		temp[4] = Integer.toString(largeCnt);// 대형차 카운트
+		temp[5] = Integer.toString(totalCar);// 총 차량 카운트
+		temp[6] = Integer.toString(totalCharge);// 총 요금
+		model2.addRow(temp);// 테이블에 추가
+	}
+
+	// 기본 테이블
+	public void defaultTable() {
+		totalCar = 0;//
+		verySmallCnt = 0;//
+		smallCnt = 0;//
+		mediumCnt = 0;//
+		largeCnt = 0;//
+		totalCharge = 0;// 통계 값 초기화
+		for (int i = 0; i < obj.length; i++) {// 파일의 내용을 temp에 저장
+			temp[0] = obj.jariNumber[i];
+			temp[1] = obj.carSelect[i];
+			temp[2] = obj.carNumber[i];
+			temp[3] = obj.printParkTime[i];
+			temp[4] = obj.printUnparkTime[i];
+			temp[5] = obj.inTime[i];
+			temp[6] = obj.charge[i];
+			model.addRow(temp);// 테이블에 추가
+			total(obj.carSelect[i], obj.inTime[i], obj.charge[i]);// 통계 계산
+			totalCar++;// 총 차량 계산
+		}
+
+		// 통계 테이블
+		temp[0] = "";//
+		temp[1] = Integer.toString(verySmallCnt);//
+		temp[2] = Integer.toString(smallCnt);//
+		temp[3] = Integer.toString(mediumCnt);//
+		temp[4] = Integer.toString(largeCnt);//
+		temp[5] = Integer.toString(totalCar);//
+		temp[6] = Integer.toString(totalCharge);//
+		model2.addRow(temp);// 테이블에 추가
+	}
+
+	@Override
+	// 체크박스 이벤트
+	public void itemStateChanged(ItemEvent ie) {
+		if (ie.getSource() == cb1) {// 차량 체크박스 체크시
+			tf2.setEnabled(false);//
+			tf3.setEnabled(false);//
+			tf4.setEnabled(false);// 날짜부분 비활성화
+			tf2.setText("");//
+			tf3.setText("");//
+			tf4.setText("");// 날짜부분 텍스트필드 초기화
+			tf1.setEnabled(true);// 차량텍스트필드 활성화
+
+		} else if (ie.getSource() == cb2) {// 날짜 체크박스 체크시
+			tf1.setEnabled(false);// 차량텍스트필드 비활성화
+			tf1.setText("");// 텍스트필드 초기화
+			tf2.setEnabled(true);//
+			tf3.setEnabled(true);//
+			tf4.setEnabled(true);// 날짜부분 활성화
+
+		}
+	}
+
+	// 테이블 부분 판넬
+	public void pan1() {
+		Font f1 = new Font("돋움", Font.BOLD, 24);// 폰트 생성
+		BoxLayout blayout = new BoxLayout(pan1, BoxLayout.Y_AXIS);// 박스레이아웃 생성
+		pan1.setLayout(blayout);// 레이아웃 설정
+		label1 = new Label("주차내역");// 라벨 생성
+		label1.setFont(f1);// 폰트설정
+		pan1.add(label1);// 라벨 부착
+		table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);// 테이블 자동 리사이즈를 off
+		table.getColumnModel().getColumn(0).setPreferredWidth(60);//
+		table.getColumnModel().getColumn(1).setPreferredWidth(100);//
+		table.getColumnModel().getColumn(2).setPreferredWidth(100);//
+		table.getColumnModel().getColumn(3).setPreferredWidth(250);//
+		table.getColumnModel().getColumn(4).setPreferredWidth(250);//
+		table.getColumnModel().getColumn(5).setPreferredWidth(100);//
+		table.getColumnModel().getColumn(6).setPreferredWidth(100);// 각각의
+																	// colomn의
+																	// 길이를 정해줌
+		scrollpane = new JScrollPane(table);// 스크롤바가 생기는 판넬에 테이블 부착
+		pan1.add(scrollpane);// 스크롤판넬을 판넬1에 부착
+		label2 = new Label("통계");// 라벨 생성
+		label2.setFont(f1);// 폰트설정
+		pan1.add(label2);// 라벨 부착
+		scrollpane2 = new JScrollPane(table2);// 스크롤바가 생기는 판넬에 테이블 부착
+		pan1.add(scrollpane2);// 스크롤판넬을 판넬1에 부착
+		table2.setPreferredScrollableViewportSize(new Dimension(300, 30));// 크기
+																			// 설정
+		add(pan1, "North");// 판넬1 부착
+		table.setEnabled(false);//
+		table2.setEnabled(false);// 테이블을 비활성화
+	}
+
+	// 검색 부분 판넬
+	public void pan3() {
+		CheckboxGroup cbg = new CheckboxGroup();// 체크박스 그룹화
+		cb1 = new Checkbox("차량번호", cbg, true);// 체크박스 생성
+		cb2 = new Checkbox("날짜", cbg, false);// 체크박스 생성
+		label3 = new Label("               ");// 공백
+		label4 = new Label("년");//
+		label5 = new Label("월");//
+		label6 = new Label("일");// 라벨 생성
+		tf1 = new JTextField(10);//
+		tf2 = new JTextField(10);//
+		tf3 = new JTextField(10);//
+		tf4 = new JTextField(10);// 텍스트필드 생성
+		pan3.add(label3);// 라벨 부착
+		pan3.add(cb1);// 체크박스 부착
+		pan3.add(tf1);// 텍스트필드 부착
+		label7 = new Label("               ");// 공백
+		pan3.add(label7);// 라벨 부착
+		pan3.add(cb2);// 체크박스 부착
+		pan3.add(tf2);// 텍스트필드 부착
+		pan3.add(label4);// 라벨 부착
+		pan3.add(tf3);// 텍스트필드 부착
+		pan3.add(label5);// 라벨 부착
+		pan3.add(tf4);// 텍스트필드 부착
+		pan3.add(label6);// 라벨 부착
+		cb1.addItemListener(this);//
+		cb2.addItemListener(this);// 아이템리스너 등록
+		search = new JButton("검색");// 검색버튼
+		search.addActionListener(this);// 액션리스너 등록
+		pan3.add(search);// //검색버튼 부착
+		tf2.setEnabled(false);//
+		tf3.setEnabled(false);//
+		tf4.setEnabled(false);// 날짜 검색부분은 비활성화 되도록 함
+		add(pan3, "South");// 판넬 부착
+
+	}
+
+	// 테이블을 지우는 메소드
+	public void removeTable() {
+		int temp = table.getRowCount();// 테이블을 줄 수를 받아와서
+		for (int i = 0; i < temp; i++) {
+			model.removeRow(0);// 제거
+		}
+		temp = table2.getRowCount();// 테이블의 줄 수를 받아와서
+		for (int i = 0; i < temp; i++) {
+			model2.removeRow(0);// 제거
+		}
+	}
+
+	// 통계를 내는 메소드
+	public void total(String carSelect, String inTime, String charge) {
+
+		if (carSelect.equals("경차"))// 차종이 경차라면
+			verySmallCnt++;// 카운트 증가
+		else if (carSelect.equals("소형차"))// 마찬가지
+			smallCnt++;
+		else if (carSelect.equals("중형차"))
+			mediumCnt++;
+		else if (carSelect.equals("대형차"))
+			largeCnt++;
+		totalCharge += Integer.parseInt(charge);// 요금을 정수형태로 변환하여 변수에 더해서 저장
+	}
+}
+
+//mainWindow.java
+
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
+
+import java.text.SimpleDateFormat;
+
+@SuppressWarnings("serial")
+class mainWindow extends JFrame implements Runnable, ActionListener {
+	JTextField blank;// 상단의 시계표시를 위해 공백을 만드는 텍스트필드
+	public JButton Btn[] = new JButton[150];// 자리 버튼
+	JTextArea condition;// 상황판 텍스트 에어리어
+	JButton configBtn;// 요금설정 버튼
+	String currentDate = "";// 현재 날짜를 저장
+	String currentTime = "";// 현재 시간을 저장
+	JButton history;// 내역보기 버튼
+	int jariNumber;// 자리번호
+	JButton notUseBtn[] = new JButton[100];// 사용하지 않는 버튼(자리 사이사이의 버튼)
+	readFile obj = new readFile();// 파일을 읽어들임
+	JPanel pan1;// 판넬1
+	JPanel pan2;// 판넬2
+	JPanel pan3;// 판넬3
+
+	// 생성자
+	public mainWindow() {
+		setTitle("주차 관리 시스템 (db2_7 칠면조)");// 제목표시줄
+		setSize(1000, 700);// 사이즈
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // 종료버튼 클릭시 종료함
+		//pan1();// 메소드 호출
+		pan2();// 메소드 호출
+		pan3();// 메소드 호출
+		gridInit();// 메소드 호출
+		setVisible(true);// 창을 보여줌
+		setResizable(false);// 크기변경 불가
+	}
+
+	@SuppressWarnings("deprecation")
+	// 버튼 이벤트
+	public void actionPerformed(ActionEvent e) {
+
+		if (e.getSource() == configBtn) {// 요금설정 버튼
+			new config();// 요금설정 클래스 실행
+		} else if (e.getSource() == history) {// 내역보기 버튼
+			new logWindow();// 내역보기 클래스 실행
+		} else if (Integer.parseInt(e.getActionCommand()) >= 0// 버튼의 이름을 정수형태로
+																// 변환하여
+				&& Integer.parseInt(e.getActionCommand()) <= Btn.length) {// 0~150사이의
+																			// 숫자면
+			jariNumber = Integer.parseInt(e.getActionCommand());// 자리번호 변수에 저장하고
+			new parkWindow(jariNumber);// 그것을 매개변수로 입차 창 띄우기
+			dispose();// 창을 닫음
+		} else {// 0~150사이의 숫자가 아닐시에는
+			for (int i = 1; i < Btn.length; i++) {// 버튼을 처음부터 끝까지 검색
+				String temp = Btn[i].getLabel();// temp에 버튼의 라벨을 저장
+				int temp2 = Integer.parseInt(temp);// temp1에 저장한 라벨을 정수형태로 변환하여
+													// 저장해 둠
+				if (temp2 == Integer.parseInt(e.getActionCommand())) {
+					// temp2에 저장해둔 라벨과 액션이벤트로 들어온 매개변수가 같다면
+					// 차가 주차되어 있는 자리가 바로 그 자리 이므로
+					jariNumber = i;// 자리번호는 i
+					break;// 루프를 나옴
+				}
+			}
+			new unparkWindow(jariNumber);// 자리번호를 매개변수로 출차 창 띄움
+			dispose();// 창을 닫음
+		}
+		
+	}
+
+	@SuppressWarnings("deprecation")
+	// 버튼을 생성하는 메소드
+	public void gridInit() {
+		for (int i = 1; i <= 15; i++) {
+			pan2.add(Btn[i] = new JButton(i + ""));
+			Btn[i].addActionListener(this);
+		}
+		for (int i = 1; i <= 15; i++) {
+			pan2.add(notUseBtn[i] = new JButton(""));
+			notUseBtn[i].setEnabled(false);
+		}
+		for (int i = 16; i <= 45; i++) {
+			pan2.add(Btn[i] = new JButton(i + ""));
+			Btn[i].addActionListener(this);
+		}
+		for (int i = 16; i <= 30; i++) {
+			pan2.add(notUseBtn[i] = new JButton(""));
+			notUseBtn[i].setEnabled(false);
+		}
+		for (int i = 46; i <= 75; i++) {
+			pan2.add(Btn[i] = new JButton(i + ""));
+			Btn[i].addActionListener(this);
+		}
+		for (int i = 31; i <= 45; i++) {
+			pan2.add(notUseBtn[i] = new JButton(""));
+			notUseBtn[i].setEnabled(false);
+		}
+		for (int i = 76; i <= 90; i++) {
+			pan2.add(Btn[i] = new JButton(i + ""));
+			Btn[i].addActionListener(this);
+		}
+		// 여기까지 버튼 생성
+		int i = 0;
+		// 차량이 주차되어 있는 자리의 라벨과 색깔을 바꿈
+		while (i < obj.length) {// 객체의 length 변수만큼 loop
+			int temp = Integer.parseInt(obj.jariNumber[i]);// 파일에 저장된 자리번호를
+															// temp에 정수형태로 저장
+			Btn[temp].setLabel(obj.carNumber[i]);// 자리번호의 버튼의 라벨을 차량번호로 바꿈
+			Btn[temp].setForeground(new Color(255, 0, 0));// 색깔을 붉은색으로 바꿈
+			i++;
+		}
+	}
+
+	// 상단의 시계를 그리는 메소드
+	/*
+	public void paint(Graphics g) {
+		
+		g.setColor(Color.black);// 사각형색 검정
+		g.fillRect(0, 0, 1500, 100);// 0,0을 기준으로 1500,100 만큼 사각형을 채움
+		g.setColor(Color.white);// 글자색 흰색
+		Font f1 = new Font("돋움", Font.BOLD, 24);// 폰트 생성
+		g.setFont(f1);// 폰트 설정
+		g.drawString(currentDate, 400, 50);// 날짜를 띄움
+		g.drawString(currentTime, 410, 90);// 시간을 띄움
+
+	}
+	*/
+	// 상단 판넬
+	/*
+	public void pan1() {
+		
+		pan1 = new JPanel();// 판넬1 생성
+		pan1.add(blank = new JTextField());// 상단의 시계표시를 위해 공백을 만드는 텍스트필드
+		blank.setPreferredSize(new Dimension(900, 70));// 공백 사이즈
+		blank.setEnabled(false);// 비활성화
+		add(pan1, "North");// 판넬1 부착
+		
+	}
+*/
+	// 중앙 버튼부분 판넬
+	public void pan2() {
+		pan2 = new JPanel();// 패널 생성
+		GridLayout layout = new GridLayout(9, 1);// 그리드 레이아웃 생성
+		pan2.setLayout(layout);// 레이아웃 설정
+		add(pan2,"Center");// 판넬2 부착
+	}
+
+	// 하단 상황판 부분 판넬
+	public void pan3() {
+		pan3 = new JPanel();// 패널 생성
+		pan3.add(condition = new JTextArea());// 상황판을 생성
+		for (int i = 0; i < 11; i++) {// 상황판에 message 클래스에 저장된 메세지를 출력함
+			condition.append(message.message[i]);
+		}
+		condition.setPreferredSize(new Dimension(700, 200));// 상황판 사이즈
+		condition.setEditable(false);// 편집 불가
+		pan3.add(history = new JButton("내역보기"));// 버튼 부착
+		pan3.add(configBtn = new JButton("요금설정"));// 버튼 부착
+		history.addActionListener(this);// 액션리스너 추가
+		configBtn.addActionListener(this);// 액션리스터 추가
+		add(pan3, "South");// 판넬3 부착
+	}
+
+	// 스레드 실행 부분
+	
+	public void run() {
+		
+		while (true) {// 반복문
+			
+			Date d = new Date();// 날짜 객체 생성
+			SimpleDateFormat date = new SimpleDateFormat("yyyy년 MM월 dd일");// 형식
+																			// 지정
+			SimpleDateFormat time = new SimpleDateFormat("hh시 mm분 ss초");// 형식 지정
+			currentDate = date.format(d);// 현재 날짜를 위에 저장해둔 형식으로 문자열 저장
+			currentTime = time.format(d);// 현재 시간을 위에 저장해둔 형식으로 문자열 저장
+			try {
+				Thread.sleep(1000);// 0.5초 텀을 두고
+				repaint();// 다시그리기를 반복
+			} catch (InterruptedException e) {
+			}
+			
+		}
+		
+	}
+	
+}
+
+//message.java
+
+public class message {
+	static int i = 0;
+	public static String message[] = new String[12];
+
+	// 매개변수가 4개인 경우
+	public message(String jariNumber, String carSelect, String carNumber,
+			String parkTime) {
+		// 배열크기 이상의 메세지가 들어오는 경우 메세지가 한칸씩 밀리도록 함
+		if (i > 10) {
+			for (int j = 0; j < 10; j++) {
+				message[j] = message[j + 1];
+			}
+			i = 10;
+		}
+		// 메세지 저장
+		message[i] = jariNumber + "번 자리로 " + carNumber + "번 차량이 " + parkTime
+				+ "에 입차되었습니다.\n";
+		i++;
+	}
+
+	// 매개변수가 6개인 경우
+	public message(String jariNumber, String carSelect, String carNumber,
+			String parkTime, String unparkTime, String inTime, String charge) {
+		// 배열크기 이상의 메세지가 들어오는 경우 메세지가 한칸씩 밀리도록 함
+		if (i > 10) {
+			for (int j = 0; j < 10; j++) {
+				message[j] = message[j + 1];
+			}
+			i = 10;
+		}
+		// 메세지 저장
+		message[i] = jariNumber + "번 자리에서 " + carNumber + "번 차량이 " + unparkTime
+				+ "에 출차되었습니다.\n";
+		i++;
+	}
+}
+
+//parkWindow.java
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.StringTokenizer;
+
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+public class parkWindow extends JFrame implements ActionListener, ItemListener,
+		time {
+	GridBagConstraints c;
+	JButton cancel;
+	String carNumber = "";
+	String carSelect = "";
+	CheckboxGroup cbg;
+	JButton confirm;
+	String jariNumber = "";
+	Label label1;
+	Label label2;
+	Label label3;
+	Checkbox large;
+	Checkbox medium;
+	readFile obj = new readFile();
+	JPanel pan1;
+	JPanel pan2;
+	JPanel pan3;
+	String parkTime = "";
+	String printParkTime = "";
+	Checkbox small;
+	String[] temp = new String[5];
+	JTextField tf1;
+	JTextField tf2;
+	Checkbox verySmall;
+
+	// 생성자
+	public parkWindow(int jariNumber) {
+		this.jariNumber = "" + jariNumber;
+		setTitle("입차");// 제목표시줄
+		setSize(400, 250);// 사이즈
+		setLocation(350, 250);// 창이 뜨는 위치
+		setVisible(true);// 창을 보이도록 설정
+		setResizable(false);// 크기 변경 불가
+		pan1();
+
+	}
+
+	// 액션이벤트
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == confirm) {// 확인버튼
+			carNumber = tf1.getText();// 차 번호를 텍스트박스에서 받음
+			jariNumber = tf2.getText();// 자리번호를 텍스트박으에서 받음
+			try {// 차량번호가 숫자가 아닐시 다이얼로그 창 띄우서 메세지 출력
+				Integer.parseInt(carNumber);
+			} catch (java.lang.NumberFormatException e2) {
+				JOptionPane.showMessageDialog(null, "차량번호는 4자리 이상의 숫자여야 합니다.");
+				return;
+			}
+			if (carSelect.equals("")) {// 차종 선택이 비어있을시 메세지 출력
+				JOptionPane.showMessageDialog(null, "차종을 선택하세요.");
+				return;
+			} else if (carNumber.length() < 4) {// 차량번호가 4자리보다 적을시 메세지 출력
+				JOptionPane.showMessageDialog(null, "차량번호는 4자리 이상의 숫자여야 합니다.");
+				return;
+			} else {// 차량 입차
+				for (int i = 0; i < 120; i++) {// 차량이 이미 입차되어있는지 검색하고 입차되어 있으면
+					try { // 메세지 출력
+						if (carNumber.equals(obj.carNumber[i])) {
+							JOptionPane.showMessageDialog(null,
+									"이미 입차되어 있는 차량입니다.");
+							return;
+						}
+					} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+					} catch (java.lang.NullPointerException e1) {
+					}
+				}
+			}
+			// 차량 입차
+			parkTime = "" + year + "/" + month + "/" + day + "/" + hour + "/"
+					+ min;// 입차 시간을 저장
+			printParkTime = ConvertTime(parkTime);// 화면 출력용 입차시간을 저장
+			new writeFile(jariNumber, carSelect, carNumber, parkTime, "-", "-",
+					"-");// 파일에 쓰는 클래스로 매개변수롤 넘겨줌
+			new message(jariNumber, carSelect, carNumber, printParkTime);// 메세지
+																			// 출력
+																			// 클래스로
+																			// 매개변수를
+																			// 넘겨줌
+			dispose();// 창 닫음
+		} else if (ae.getSource() == cancel) {// 취소 버튼
+			dispose();// 창 닫음
+		}
+		mainWindow cl = new mainWindow();
+		Thread th = new Thread(cl);
+		th.start();// 스레드를 재실행
+	}
+
+	// 저장된 시간을 화면출력용 시간으로 바꾸는 메소드
+	private String ConvertTime(String time) {
+		StringTokenizer parse = new StringTokenizer(time, "/");// 토크나이저로 저장된 시간을
+																// 나눈후
+		temp[0] = parse.nextToken();// 배열에 각각 저장
+		temp[1] = parse.nextToken();
+		temp[2] = parse.nextToken();
+		temp[3] = parse.nextToken();
+		temp[4] = parse.nextToken();
+		String printTime = temp[0] + "년 " + temp[1] + "월 " + temp[2] + "일 "
+				+ temp[3] + "시 " + temp[4] + "분";// 다시 출력용 시간으로 합침
+		return printTime;
+	}
+
+	@Override
+	// 체크박스 이벤트
+	public void itemStateChanged(ItemEvent ie) {
+		// 차종을 선택함
+		if (ie.getSource() == verySmall) {
+			carSelect = "경차";
+		} else if (ie.getSource() == small) {
+			carSelect = "소형차";
+		} else if (ie.getSource() == medium) {
+			carSelect = "중형차";
+		} else if (ie.getSource() == large) {
+			carSelect = "대형차";
+		}
+
+	}
+
+	// 그리드백 레이아웃을 손쉽게 사용하기위해 만듬
+	public void layout(Component obj, int x, int y, int width, int height) {
+		c.gridx = x; // 시작위치 x
+		c.gridy = y; // 시작위치 y
+		c.gridwidth = width; // 컨테이너 너비
+		c.gridheight = height; // 컨테이너 높이
+		add(obj, c);
+	}
+
+	// 판넬
+	public void pan1() {
+		GridBagLayout gridbag = new GridBagLayout();// 그리드백 레이아웃 생성
+		setLayout(gridbag);// 레이아웃 설정
+		c = new GridBagConstraints();// 그리드백 레이아웃을 제어하는 객체
+		c.fill = GridBagConstraints.BOTH; // 전체를 채움
+		CheckboxGroup cbg = new CheckboxGroup();// 체크박스 그룹
+		verySmall = new Checkbox("경차", cbg, false);
+		small = new Checkbox("중형차", cbg, false);
+		medium = new Checkbox("소형차", cbg, false);
+		large = new Checkbox("대형차", cbg, false);// 체크박스를 생성
+		tf1 = new JTextField();// 차량번호 텍스트필드
+		tf2 = new JTextField(jariNumber);// 자리번호 텍스트필드
+		confirm = new JButton("확인");// 확인버튼
+		cancel = new JButton("취소");// 취소버튼
+		confirm.addActionListener(this);// 액션리스너 등록
+		cancel.addActionListener(this);// 액션리스너 등록
+		layout(new Label("차종"), 0, 0, 1, 2); // 라벨 부착
+		layout(verySmall, 1, 1, 1, 1);//
+		layout(small, 2, 1, 1, 1);//
+		layout(medium, 3, 1, 1, 1);//
+		layout(large, 4, 1, 1, 1);// 체크박스 부착
+		verySmall.addItemListener(this);//
+		small.addItemListener(this);//
+		medium.addItemListener(this);//
+		large.addItemListener(this);// 아이템 리스너 등록
+		layout(new Label("차량번호"), 0, 2, 1, 1);// 라벨 부착
+		layout(tf1, 1, 2, 4, 1);// 텍스트필드 부착
+		layout(new Label("자리번호"), 0, 3, 1, 1);// 라벨 부착
+		layout(tf2, 1, 3, 4, 1);// 텍스트필드 부착
+		layout(new Label(""), 1, 4, 1, 1);// 한칸 공백
+		layout(new Label("입차하시겠습니까?"), 1, 5, 4, 1);// 라벨 부착
+		layout(confirm, 1, 6, 2, 1);// 확인버튼 부착
+		layout(cancel, 3, 6, 2, 1);// 취소버튼 부착
+		tf2.setEditable(false);// 자리번호 텍스트필드 편집 불가
+
+	}
+}
+
+//readFile.java
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+public class readFile {
+	public int c[];// 기본요금,단위요금,최대요금
+	public String carNumber[];
+	public String carSelect[];
+	public String charge[];
+	public String inTime[];
+	public String jariNumber[];
+	public int length;
+	public String parkTime[];
+	public String printParkTime[];
+	public String printUnparkTime[];
+	public String temp[] = new String[5];
+	public String temp1 = "";
+	public String unparkTime[];
+
+	// 생성자
+	public readFile() {
+		readdata();
+		readconfig();
+	}
+
+	// 설정파일을 읽는 부분
+	public void readconfig() {
+			CustomResultSet rs = DataBase.executeQuery("select * from data where name='config'");
+			if(rs.next()){
+			temp1 = rs.getString("value");
+			c = new int[12];// 배열 생성
+			StringTokenizer parse = new StringTokenizer(temp1, ",");// 토크나이저로
+																	// 문자열을 나눔
+			String temp[] = new String[15];// 토큰을 배열에 저장
+			for (int i = 0; i < 12; i++) {// 배열에 저장한 토큰을 정수형으로 변환해서 저장
+				temp[i] = parse.nextToken();
+				c[i] = Integer.parseInt(temp[i]);
+			}
+			}else{
+				String temp = "2000,500,10000,3000,1000,15000,4000,1500,15000,5000,2000,20000";
+				DataBase.executeUpdate(DataBase.queryBuilder("insert into data values('config', '",temp,"')"));
+			}
+	}
+
+	// 현재 주차장의 차량정보를 읽는 부분
+	public void readdata() {
+			CustomResultSet rs = DataBase.executeQuery("select value from data where name='data'");
+			String csvStr = "";//
+			while (rs.next()) {//
+					csvStr = csvStr + rs.getString(1) + ",";
+			}//
+			// 파일을 끝까지 읽은 후
+			StringTokenizer parse = new StringTokenizer(csvStr, ",");// 토크나이저로
+																		// 파일로부터
+																		// 전부
+																		// 읽어들인
+																		// 변수를
+																		// 나눔
+			length = (parse.countTokens() / 7);// length의 길이는 토큰숫자/7 이렇게하면 배열을
+												// 미리 생성할 필요가 없이 딱 맞는 크기로 생성
+			jariNumber = new String[length];//
+			carSelect = new String[length];//
+			carNumber = new String[length];//
+			parkTime = new String[length];//
+			unparkTime = new String[length];//
+			inTime = new String[length];//
+			charge = new String[length];// 배열 생성
+			for (int i = 0; i < length; i++) {
+				jariNumber[i] = parse.nextToken();
+				carSelect[i] = parse.nextToken();
+				carNumber[i] = parse.nextToken();
+				parkTime[i] = parse.nextToken();
+				unparkTime[i] = parse.nextToken();
+				inTime[i] = parse.nextToken();
+				charge[i] = parse.nextToken();// 생성된 배열에 토큰을 차례대로 저장
+			}
+	}
+
+}
+
+//readLog.java
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.StringTokenizer;
+
+public class readLog {
+	public String carNumber[];
+	public String carSelect[];
+	public String charge[];
+	public String inTime[];
+	public String jariNumber[];
+	public int length;
+	public String parkTime[];
+	StringTokenizer parse;
+	public String printParkTime[];
+	public String printUnparkTime[];
+	public String temp[] = new String[5];
+	public String unparkTime[];
+
+	public readLog() {
+		try {
+			FileReader file = new FileReader(new File("log.csv"));// 로그 파일을 열음
+			BufferedReader r = new BufferedReader(file);// 버퍼리더로 열음
+			String csvStr = "";
+			String tmpStr = "";
+			while (tmpStr != null) {
+				tmpStr = r.readLine();// 변수에 라인단위로 읽어서 저장
+				if (tmpStr != null) {
+					csvStr = csvStr + tmpStr + ",";// 라인단위로 읽어들인 것을 다른 변수에 계속
+													// 추가함
+				}
+			}
+			parse = new StringTokenizer(csvStr, ",");
+			;// 토크나이저로 파일로부터 전부 읽어들인 변수를 나눔
+			length = (parse.countTokens() / 7);// length의 길이는 토큰숫자/7 이렇게하면 배열을
+												// 미리 생성할 필요가 없이 딱 맞는 크기로 생성
+			jariNumber = new String[length];//
+			carSelect = new String[length];//
+			carNumber = new String[length];//
+			parkTime = new String[length];//
+			unparkTime = new String[length];//
+			printParkTime = new String[length];//
+			printUnparkTime = new String[length];//
+			inTime = new String[length];//
+			charge = new String[length];// 배열 생성
+			for (int i = 0; i < length; i++) {
+				jariNumber[i] = parse.nextToken();
+				carSelect[i] = parse.nextToken();
+				carNumber[i] = parse.nextToken();
+				parkTime[i] = parse.nextToken();
+				unparkTime[i] = parse.nextToken();
+				inTime[i] = parse.nextToken();
+				charge[i] = parse.nextToken();// 생성된 배열에 토큰을 차례대로 저장
+			}
+			for (int i = 0; i < length; i++) {
+				printParkTime[i] = ConvertTime(parkTime[i]);
+				printUnparkTime[i] = ConvertTime(unparkTime[i]);// 출력용 시간을 저장
+			}
+		} catch (IOException e) {
+		}
+	}
+
+	// 저장된 시간을 화면출력용 시간으로 바꾸는 메소드
+	private String ConvertTime(String time) {
+		StringTokenizer parse = new StringTokenizer(time, "/");// 토크나이저로 저장된 시간을
+																// 나눈후
+		temp[0] = parse.nextToken();// 배열에 각각 저장
+		temp[1] = parse.nextToken();
+		temp[2] = parse.nextToken();
+		temp[3] = parse.nextToken();
+		temp[4] = parse.nextToken();
+		String printTime = temp[0] + "년 " + temp[1] + "월 " + temp[2] + "일 "
+				+ temp[3] + "시 " + temp[4] + "분";// 다시 출력용 시간으로 합침
+		return printTime;
+	}
+}
+
+//time.java
+
+import java.util.Calendar;
+
+//시스템으로 부터 시간을 받아와 저장하는 인터페이스
+public interface time {
+	Calendar present = Calendar.getInstance();
+	int day = present.get(Calendar.DATE);
+	int hour = present.get(Calendar.HOUR_OF_DAY);
+	int min = present.get(Calendar.MINUTE);
+	int month = present.get(Calendar.MONTH) + 1;
+	int sec = present.get(Calendar.SECOND);
+	int year = present.get(Calendar.YEAR);
+}
+
+//unparkWindow.java
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.StringTokenizer;
+
+import javax.swing.*;
+
+@SuppressWarnings("serial")
+public class unparkWindow extends JFrame implements ActionListener, time {
+	GridBagConstraints c;
+	JButton cancel;
+	String carNumber;
+	String carSelect;
+	CheckboxGroup cbg;
+	String charge;
+	JButton confirm;
+	String inTime;
+	String jariNumber;
+	Checkbox large;
+	Checkbox medium;
+	readFile obj = new readFile();
+	JPanel pan1;
+	JPanel pan2;
+	JPanel pan3;
+	String parkTime;
+	StringTokenizer parse;
+	String printParkTime;
+	String printUnparkTime;
+	String pt[];
+	int ptInt[];
+	Checkbox small;
+	String temp[] = new String[5];
+	int temp1;
+	int temp2;
+	int temp3;
+	JTextField tf0;
+	JTextField tf1;
+	JTextField tf2;
+	JTextField tf3;
+	JTextField tf4;
+	JTextField tf5;
+	JTextField tf6;
+	String unparkTime;
+	String upt[];
+	int uptInt[];
+	Checkbox verySmall;
+
+	// 생성자
+	public unparkWindow(int jariNumber) {
+		for (int i = 0; i < obj.length; i++) {// 매개변수로 들어온 자리번호를 저장된 파일에서 검색
+			if (jariNumber == Integer.parseInt(obj.jariNumber[i])) {// 자리번호가 같다면
+				temp1 = i;// 그 배열의 번호를 temp1에 저장해둠
+				break;
+			}
+		}
+		this.carSelect = obj.carSelect[temp1];// 위에서 찾은 배열의 번호를 이용하여 변수 설정
+		this.carNumber = obj.carNumber[temp1];// 위에서 찾은 배열의 번호를 이용하여 변수 설정
+		this.jariNumber = "" + jariNumber;// 자리번호 설
+		this.parkTime = obj.parkTime[temp1];// 위에서 찾은 배열의 번호를 이용하여 변수 설정
+		this.printParkTime = ConvertTime(parkTime);// 위에서 찾은 배열의 번호를 이용하여 변수 설정
+		this.unparkTime = "" + year + "/" + month + "/" + day + "/" + hour
+				+ "/" + min;// 현재 시간을 출차시간으로 저장
+		this.printUnparkTime = ConvertTime(unparkTime);// 저장한 출차시간을 출력용 출차시간으로
+														// 변환
+		this.inTime = "" + intime();// 주차 시간을 계산
+		this.charge = "" + charge();// 요금을 계산
+		setTitle("출차");// 타이틀
+		setSize(250, 300);// 사이즈
+		setLocation(350, 250);// 창이 뜬느 위치
+		setVisible(true);// 보이도록함
+		setResizable(false);// 크기 변경 불가
+		pan1();// 메소드 호출
+	}
+
+	@Override
+	// 버튼이벤트
+	public void actionPerformed(ActionEvent ae) {
+		if (ae.getSource() == confirm) {// 확인 버튼
+			new writeFile(jariNumber, carSelect, carNumber, parkTime,
+					unparkTime, inTime, charge);// 위에서 저장한 변수들을 매개변수로 하여 파일에 쓰는
+												// 클래스로 넘겨줌
+			new message(jariNumber, carSelect, carNumber, printParkTime,
+					printUnparkTime, inTime, charge);// 상황판에 메세지를 출력
+			dispose();// 창을 닫음
+		} else if (ae.getSource() == cancel) {// 취소 버튼
+			dispose();// 창을 닫음
+		}
+		mainWindow cl = new mainWindow();
+		Thread th = new Thread(cl);
+		th.start();// 스레드를 새로 실행
+	}
+
+	// 요금 설정
+	// c[0]~c[12]==요금을 저장해 둔 변수
+	public int charge() {
+		if (carSelect.equals("경차")) {// 차종이 경차
+			if (intime() < 60) {// 주차되어 있는 시간이 60분 미만일시
+				return obj.c[0];// 저장된 요금 리턴
+			} else if (intime() <= 60) {// 60분 이상일시
+				if ((((intime() - 60) / 30 + 1) * obj.c[1]) + obj.c[0] < obj.c[2]) {// 계산된
+																					// 요금이
+																					// 최대요금보다
+																					// 작으면
+					return (((intime() - 60) / 30 + 1) * obj.c[1]) + obj.c[0];// 계산된
+																				// 요금
+																				// 리턴
+				} else if ((((intime() - 60) / 30 + 1) * obj.c[1]) + obj.c[0] > obj.c[2]) {// 계산된
+																							// 요금이
+																							// 최대요금보다
+																							// 크면
+					return obj.c[2];// 최대요금 리턴
+				}
+			}
+
+		}
+		// 아래는 위의 경차 계산방법과 동일함
+		else if (carSelect.equals("소형차")) {
+			if (intime() < 60) {
+				return obj.c[3];
+			} else if (intime() <= 60) {
+				if ((((intime() - 60) / 30 + 1) * obj.c[4]) + obj.c[3] < obj.c[5]) {
+					return (((intime() - 60) / 30 + 1) * obj.c[4]) + obj.c[3];
+				} else if ((((intime() - 60) / 30 + 1) * obj.c[4]) + obj.c[3] > obj.c[5]) {
+					return obj.c[5];
+				}
+			}
+		} else if (carSelect.equals("중형차")) {
+			if (intime() < 60) {
+				return obj.c[6];
+			} else if (intime() <= 60) {
+				if ((((intime() - 60) / 30 + 1) * obj.c[7]) + obj.c[6] < obj.c[8]) {
+					return (((intime() - 60) / 30 + 1) * obj.c[7]) + obj.c[6];
+				} else if ((((intime() - 60) / 30 + 1) * obj.c[7]) + obj.c[6] > obj.c[8]) {
+					return obj.c[8];
+				}
+			}
+		} else if (carSelect.equals("대형차")) {
+			if (intime() < 60) {
+				return obj.c[9];
+			} else if (intime() <= 60) {
+				if ((((intime() - 60) / 30 + 1) * obj.c[10]) + obj.c[9] < obj.c[11]) {
+					return (((intime() - 60) / 30 + 1) * obj.c[10]) + obj.c[9];
+				} else if ((((intime() - 60) / 30 + 1) * obj.c[10]) + obj.c[9] > obj.c[11]) {
+					return obj.c[11];
+				}
+			}
+		}
+		return 0;
+	}
+
+	// 저장된 시간을 화면출력용 시간으로 바꾸는 메소드
+	private String ConvertTime(String time) {
+		StringTokenizer parse = new StringTokenizer(time, "/");// 토크나이저로 저장된 시간을
+																// 나눈후
+		temp[0] = parse.nextToken();// 배열에 각각 저장
+		temp[1] = parse.nextToken();
+		temp[2] = parse.nextToken();
+		temp[3] = parse.nextToken();
+		temp[4] = parse.nextToken();
+		String printTime = temp[0] + "년 " + temp[1] + "월 " + temp[2] + "일 "
+				+ temp[3] + "시 " + temp[4] + "분";// 다시 출력용 시간으로 합침
+		return printTime;
+	}
+
+	// 주차시간을 계산
+	public int intime() {
+		pt = new String[5];
+		ptInt = new int[5];
+		upt = new String[5];
+		uptInt = new int[5];
+		StringTokenizer parse1 = new StringTokenizer(parkTime, "/");// 입차시간을
+																	// 토크나이저로 나눔
+		StringTokenizer parse2 = new StringTokenizer(unparkTime, "/");// 출차시간을
+																		// 토크나이저로
+																		// 나눔
+		for (int i = 0; i < 5; i++) {
+			pt[i] = parse1.nextToken();// 입차시간 토큰 저장
+			ptInt[i] = Integer.parseInt(pt[i]);// 토큰을 정수형태로 변환
+			upt[i] = parse2.nextToken();// 출차 시간토큰 저장
+			uptInt[i] = Integer.parseInt(upt[i]);// 토큰을 정수형태로 변환
+		}
+		temp2 = (ptInt[2] * 1440) + (ptInt[3] * 60) + (ptInt[4]);// 입차시간을 분 단위로
+																	// 저장
+		temp3 = (uptInt[2] * 1440) + (uptInt[3] * 60) + (uptInt[4]);// 출차시간을 분
+																	// 단위로 저장
+		return temp3 - temp2;// 출차시간-입차시간=주차시간 리턴
+	}
+
+	// 그리드백 레이아웃을 손쉽게 사용하기위해 만듬
+	public void layout(Component obj, int x, int y, int width, int height) {
+		c.gridx = x; // 시작위치 x
+		c.gridy = y; // 시작위치 y
+		c.gridwidth = width; // 컨테이너 너비
+		c.gridheight = height; // 컨테이너 높이
+		add(obj, c);
+	}
+
+	// 판넬
+	public void pan1() {
+		GridBagLayout gridbag = new GridBagLayout();// 그리드백 레이아웃 생성
+		setLayout(gridbag);// 레이아웃 설정
+		c = new GridBagConstraints();// 그리드백 레이아웃을 제어하는 객체
+		c.fill = GridBagConstraints.BOTH; // 전체를 채움
+		tf0 = new JTextField(carSelect);// 차종 텍스트필드
+		tf1 = new JTextField(carNumber);// 차량번호 텍스트필드
+		tf2 = new JTextField(jariNumber);// 자리번호 텍스트필드
+		tf3 = new JTextField(printParkTime);// 입차시간
+		tf4 = new JTextField(printUnparkTime);// 출차시간
+		tf5 = new JTextField(inTime);// 주차시간
+		tf6 = new JTextField(charge);// 요금
+		confirm = new JButton("확인");// 확인버튼
+		cancel = new JButton("취소");// 취소버튼
+		confirm.addActionListener(this);
+		cancel.addActionListener(this);// 액션리스너 등록
+		layout(new Label("차종"), 0, 0, 1, 2); // 라벨 부착
+		layout(tf0, 1, 1, 4, 1);// 차종 텍스트필드 부착
+		layout(new Label("차량번호"), 0, 2, 1, 1);// 라벨부착
+		layout(tf1, 1, 2, 4, 1);// 차량번호 텍스트필드 부착
+		layout(new Label("자리번호"), 0, 3, 1, 1);// 라벨부착
+		layout(tf2, 1, 3, 4, 1);// 자리번호 텍스트필드 부착
+		layout(new Label("입차시간"), 0, 4, 1, 1);// 라벨 부착
+		layout(tf3, 1, 4, 4, 1);// 입차시간 텍스트필드 부착
+		layout(new Label("출차시간"), 0, 5, 1, 1);// 라벨부착
+		layout(tf4, 1, 5, 4, 1);// 출차시간 텍스트필드 부착
+		layout(new Label("주차시간(분)"), 0, 6, 1, 1);// 라벨 부착
+		layout(tf5, 1, 6, 4, 1);// 주차시간 텍스트필드 부착
+		layout(new Label("요금"), 0, 7, 1, 1);// 라벨부착
+		layout(tf6, 1, 7, 4, 1);// 요금 텍스트필드 부착
+		layout(new Label(""), 1, 8, 1, 1);// 한칸 공백
+		layout(new Label("출차하시겠습니까?"), 1, 9, 4, 1);// 라벨 부착
+		layout(confirm, 1, 10, 2, 1);// 확인버튼 부착
+		layout(cancel, 3, 10, 2, 1);// 취소버튼 부착
+		tf0.setEditable(false);
+		tf1.setEditable(false);
+		tf2.setEditable(false);
+		tf3.setEditable(false);
+		tf4.setEditable(false);
+		tf5.setEditable(false);
+		tf6.setEditable(false);// 텍스트 필드 편집이 불가
+
+	}
+}
+
+//writeFile.java
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class writeFile {
+
+	public String carNumber;
+	public String carSelect;
+	public String charge;
+	public String inTime;
+	public String jariNumber;
+	readFile obj = new readFile();
+	public String parkTime;
+	public String unparkTime;
+
+	// 생성자
+	public writeFile(String jariNumber, String carSelect, String carNumber,
+			String parkTime, String unparkTime, String inTime, String charge) {
+		this.carSelect = carSelect;
+		this.jariNumber = jariNumber;
+		this.carNumber = carNumber;
+		this.parkTime = parkTime;
+		this.unparkTime = unparkTime;
+		this.inTime = inTime;
+		this.charge = charge;
+		write();// 메소드 호출
+	}
+
+	public void write() {
+			if (charge == "-") {// 요금 부분의 매개변수가 "-" 일시에는 입차화면에서 들어온 것임
+				// 입차 부분
+				StringBuilder builder = new StringBuilder();
+				builder.append(jariNumber);//
+				builder.append(",");//
+				builder.append(carSelect);//
+				builder.append(",");//
+				builder.append(carNumber);//
+				builder.append(",");//
+				builder.append(parkTime);//
+				builder.append(",");//
+				builder.append(unparkTime);//
+				builder.append(",");//
+				builder.append(inTime);//
+				builder.append(",");//
+				builder.append(charge);//
+				DataBase.execute(DataBase.queryBuilder("Insert into data values('data', '",builder.toString(),"')"));
+			} else {// 요금부분의 매개변수가 "-"가 아닐시에는 출차화면에서 들어온 것임
+				// 출차 부분
+				DataBase.executeUpdate("delete from data");
+				int temp1, temp2;
+				temp1 = Integer.parseInt(jariNumber);// temp 변수에 매개변수로 들어온 자리번호를
+														// 정수형으로 변환하여 저장
+				int temp = -1;
+				// log 파일 부분(내역 저장)
+				for (int i = 0; i < obj.length; i++) {// 파일에서 읽어들인 것을 검색
+					temp2 = Integer.parseInt(obj.jariNumber[i]);// 파일의 자리번호를
+																// 정수형으로 변환
+					if (temp1 == temp2) {// 매개변수로 들어온것과 파일의 자리번호가 같다면
+						temp = i;// temp에 그 배열번호를 저장해둠
+						StringBuilder builder = new StringBuilder();
+						builder.append(jariNumber);//
+						builder.append(",");//
+						builder.append(carSelect);//
+						builder.append(",");//
+						builder.append(carNumber);//
+						builder.append(",");//
+						builder.append(parkTime);//
+						builder.append(",");//
+						builder.append(unparkTime);//
+						builder.append(",");//
+						builder.append(inTime);//
+						builder.append(",");//
+						builder.append(charge);//
+						DataBase.executeUpdate(DataBase.queryBuilder("insert into data values('log', '",builder.toString(),"')"));
+						break;
+					}
+				}
+				// data 파일 부분(주차장의 정보 저장)
+				for (int i = 0; i < obj.length; i++) {// 파일에서 읽어들인 것을 검색
+					if (i == temp)// 배열에서 하나씩 검색하면서 파일에 써 넣는데
+						continue;// 만약 위에서 저장해둔 temp와 i가 같다면 그 차량은 출차된 차량이므로 파일에
+									// 쓰지 않고 continue 함.
+					StringBuilder builder = new StringBuilder();
+					builder.append(obj.jariNumber[i]);
+					builder.append(",");
+					builder.append(obj.carSelect[i]);
+					builder.append(",");
+					builder.append(obj.carNumber[i]);
+					builder.append(",");
+					builder.append(obj.parkTime[i]);
+					builder.append(",");
+					builder.append(obj.unparkTime[i]);
+					builder.append(",");
+					builder.append(obj.inTime[i]);
+					builder.append(",");
+					builder.append(obj.charge[i]);
+					DataBase.execute(DataBase.queryBuilder("Insert into data values('data', '",builder.toString(),"')"));
+				}
+			}
+	}
+}
