@@ -1,0 +1,35 @@
+// database »ý¼º
+
+create database db2_7;
+
+create table db2_7.in {
+	jariNumber TEXT not null Primary Key,
+	carSelect TEXT not null,
+	carNumber TEXT not null,
+	parkTime TEXT not null
+}
+
+create table db2_7.out {
+	jariNumber int not null Foreign Key,
+	carSelect TEXT not null,
+	carNumber TEXT not null Primary Key,
+	parkTime TEXT not null ,
+	unparkTime TEXT not null,
+	inTime TEXT not null,
+	charge TEXT not null
+}
+
+create table db2_7.config {
+	smallbasic TEXT not null,
+	smalladd TEXT not null,
+	smallmax TEXT not null,
+	compactbasic TEXT not null,
+	compactadd TEXT not null,
+	compactmax TEXT not null,
+	mediumbasic TEXT not null,
+	mediumadd TEXT not null,
+	mediummax TEXT not null,
+	bigbasic TEXT not null,
+	bigadd TEXT not null,
+	bigmax TEXT not null
+}
